@@ -18,3 +18,46 @@ defmodule Env do
   end
 
 end
+
+defmodule Eager do
+  # If env is empty accept the atom
+  def eval_expr({:atm, id}, []) do {:ok, id} end
+
+  # If atom does not exist in env accept it, otherwise error
+  def eval_expr({:atm, id}, env) do
+    # iterate through env to check if id exists
+    case Env.lookup(id, env) do
+      [] ->
+        {:ok, id}
+      {id,_} ->
+        :error
+    end
+  end
+
+  # If var exists in env return its value, otherwise error
+  def eval_expr({:var, id}, env) do
+    # Check if id exists in env
+    case Env.lookup(id, env) do
+      [] ->
+        :error
+      {_, str} ->
+        {:ok, str}
+    end
+  end
+
+  # if head and tail exists in env return ok
+  def eval_expr({:cons, head_expr, tail_expr}, env) do
+    case eval_expr(head_expr, env) do
+      :error ->
+        :error
+      {:ok, head} ->
+        case eval_expr(tail_expr, env) do
+          :error ->
+            :error
+          {:ok, tail} ->
+            {:ok, {head, tail}}
+        end
+    end
+  end
+
+end
