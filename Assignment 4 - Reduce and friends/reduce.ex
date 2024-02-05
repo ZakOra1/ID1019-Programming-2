@@ -32,9 +32,8 @@ defmodule Reduce do
 
   # return the sum of all values of the given list.
   @spec sum([integer()]) :: integer()
-  def sum([hd | []], acc), do: acc + hd
-  def sum([hd | tl], acc), do: sum(tl, acc + hd)
-  def sum([hd | tl]), do: sum(tl, hd)
+  def sum([]), do: 0
+  def sum([hd | tl]), do: hd + sum(tl)
 
 
   # return a list where each element of the given list has been decremented by a value.
@@ -97,5 +96,4 @@ defmodule Reduce do
       divs(tl, value)
     end
   end
-
 end
