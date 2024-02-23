@@ -12,6 +12,10 @@ defmodule Chopstick do
     end
   end
 
+  def quit(stick) do
+    send(stick, :quit)
+  end
+
   def gone() do
     receive do
       :return -> available()
@@ -21,8 +25,14 @@ defmodule Chopstick do
 
   def request(stick) do
     send(stick, {:request, self()})
+  end
+
+  def granted(stick) do
     receive do
-      :granted -> :ok
+      :granted ->
+        :ok
+    after
+      1000 -> :no
     end
   end
 
