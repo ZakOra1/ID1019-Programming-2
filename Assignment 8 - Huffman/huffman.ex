@@ -11,23 +11,25 @@ defmodule Huffman do
   end
 
   def test do
-    #decode = decode_table(tree)
-
     sample = read("kallocain.txt")
     text = read("kallocain.txt")
     tree = tree(sample)
     IO.puts("Sample complete")
-    encode = encode_table(tree)
-    IO.puts("Encode table complete")
-    seq = encode(text, encode)
-    IO.puts("Encode complete")
-    #decode(seq, encode)
+
+    # Measure the time to encode the message
+    {encode_time, encode} = :timer.tc(fn -> encode_table(tree) end)
+    IO.puts("Encode table complete in #{encode_time / 1_000_000} seconds")
+
+    {seq_time, seq} = :timer.tc(fn -> encode(text, encode) end)
+    IO.puts("Encode complete in #{seq_time / 1_000_000} seconds")
+
+    # Measure the time to decode the message
+    {decode_time, decoded_message} = :timer.tc(fn -> decode(seq, encode) end)
+    IO.puts("Decode complete in #{decode_time / 1_000_000} seconds")
 
     {:ok, file} = File.open("output.txt", [:write, {:encoding, :utf8}])
-    IO.write(file, List.to_string(decode(seq, encode)))
+    IO.write(file, List.to_string(decoded_message))
     :ok = File.close(file)
-
-    IO.puts("Decode complete")
   end
 
 
@@ -47,7 +49,6 @@ defmodule Huffman do
   def encode_table(tree) do
     depth_first_traversal(tree, [])
   end
-
   def depth_first_traversal({left, right}, acc) do
     depth_first_traversal(left, acc ++ [0]) ++ depth_first_traversal(right, acc ++ [1])
   end
@@ -56,17 +57,24 @@ defmodule Huffman do
   end
 
   # Encode text
-  def encode([], _table, acc), do: List.flatten(acc)
-  def encode([c1 | tail], table, acc) do
-    # Encode the text using the mapping in the table, return a sequence of bits
-    {_c1, path} = Enum.find(table, fn {c2, _} -> c1 == c2 end)
-    IO.puts("Path: ")
-    IO.inspect(path)
-    acc = acc ++ [path]
-    encode(tail, table, acc)
-  end
+  #def encode([], _table, acc), do: List.flatten(acc)
+  #def encode([c1 | tail], table, acc) do
+  #  # Encode the text using the mapping in the table, return a sequence of bits
+  #  {_c1, path} = Enum.find(table, fn {c2, _} -> c1 == c2 end)
+  #  #IO.puts("Path: ")
+  #  #IO.inspect(path)
+  #  acc = acc ++ [path]
+  #  encode(tail, table, acc)
+  #end
+  #def encode(text, table) do
+  #  encode(text, table, [])
+  #end
+
   def encode(text, table) do
-    encode(text, table, [])
+    List.flatten(Enum.map(text, fn c1 ->
+      {_, path} = Enum.find(table, fn {c2, _} -> c1 == c2 end)
+      path
+    end))
   end
 
 
@@ -90,7 +98,6 @@ defmodule Huffman do
     {path, rest} = Enum.split(seq, n)
     case List.keyfind(table, path, 1) do
       {char, _} ->
-        IO.puts("Found: #{char}")
         {char, rest}
       nil ->
         decode_char(seq, n+1, table)
