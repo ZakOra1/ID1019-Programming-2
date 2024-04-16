@@ -3,6 +3,8 @@ This is my code and reports for the course ID1019 Programming 2 at KTH (Royal In
 
 The course covers functional programming with the language elixir and is an introduction to recursive and functional programming thought process.
 
+All of the different assignments were done with a time-limit of five days, including the reports for the code. 
+
 # Content and learning outcomes 
 ## Course contents
 The course goes through partly the programming techniques that are used in functional programming languages, partly how programmes can be divided into several executing threads and how these can be coordinated. Examples of programming techniques are recursive definitions, non-updateable data structures, functions of higher order and so called “closures”. Coordination of multiple threads is shown, partly through modification of common data structures, partly through message passing between processes.
